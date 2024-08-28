@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import './styles.css'
 import Header from './components/Header'
 import FrontMessage from './components/FrontMessage'
@@ -22,15 +22,40 @@ export default function App() {
 */
 
   const [cardOpen, setCardOpen] = useState(false)
+  const startX=useRef(0)
+  const startY=useRef(0)
+  const drag=useRef(false)
 
+  const handleMouseDown=(e)=>{
+    startX.current=e.clientX
+    startY.current=e.clientY
+    drag.current=true
+
+  }
+  const handleMouseMove=(e)=>{
+    if(!drag.current)return
+    const diffx=e.clientX-startX.current
+    const diffy=e.clientY-startY.current
+    if(diffx <=-50 && !cardOpen){
+      setCardOpen(true)
+    }
+    if(cardOpen && diffy>20){
+      setCardOpen(false)
+    }
+  }
+  const handleMouseUp = () => {
+    drag.current = false
+  }
   return (
     <div className='wrapper'>
       <Header />
       <div className='card'>
         <InnerMessage />
-
         <div
-          onClick={() => setCardOpen((pre) => !pre)}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+         
           className={`cover ${cardOpen && 'open'}`}
         >
           <FrontMessage />
